@@ -44,21 +44,24 @@ def collect_modlog_stats(r, subreddit, time_limit = None):
 def save_modlog(current_day, subreddit):
     global mod_actions
 
-    print("Saving modlog for the day " + str(current_day))
+    if not current_day == int (datetime.combine(date.today(), time()).strftime("%s")):
 
-    for mod in mod_actions[current_day]:
-        for action in mod_actions[current_day][mod]:
-            if not action == "reasons":
-                result = db.insert_modlog(current_day, mod, action, mod_actions[current_day][mod][action], subreddit)
-                if result == 0:
-                    return 0
-
-    if "AutoModerator" in mod_actions[current_day]:
-        for reason in mod_actions[current_day]["AutoModerator"]["reasons"]:
-            db.insert_automod(current_day, reason, mod_actions[current_day]["AutoModerator"]["reasons"][reason], subreddit)
-
-    del mod_actions[current_day]
-    return 1
+        print("Saving modlog for the day " + str(current_day))
+    
+        for mod in mod_actions[current_day]:
+            for action in mod_actions[current_day][mod]:
+                if not action == "reasons":
+                    result = db.insert_modlog(current_day, mod, action, mod_actions[current_day][mod][action], subreddit)
+                    if result == 0:
+                        return 0
+    
+        if "AutoModerator" in mod_actions[current_day]:
+            for reason in mod_actions[current_day]["AutoModerator"]["reasons"]:
+                db.insert_automod(current_day, reason, mod_actions[current_day]["AutoModerator"]["reasons"][reason], subreddit)
+    
+        del mod_actions[current_day]
+        return 1
+    return 0
 
 
 def collect_log_entry(log_entry, day):
